@@ -1,0 +1,102 @@
+resources:
+  jobs:
+    Stalking_Pipeline:
+      name: Stalking-Pipeline
+      tasks:
+        - task_key: Clear_Bronze
+          notebook_task:
+            notebook_path: /Workspace/flights/cleaning/drop_bronze
+            source: WORKSPACE
+        - task_key: Clear_Gold
+          notebook_task:
+            notebook_path: /Workspace/flights/cleaning/drop_gold
+            source: WORKSPACE
+        - task_key: Clear_Silver
+          notebook_task:
+            notebook_path: /Workspace/flights/cleaning/drop_silver
+            source: WORKSPACE
+        - task_key: Create_Bronze
+          depends_on:
+            - task_key: Clear_Bronze
+          notebook_task:
+            notebook_path: /Workspace/flights/medallion_managing/bronze/bronze_flights_load_data
+            source: WORKSPACE
+        - task_key: Create_Gold
+          depends_on:
+            - task_key: Clear_Gold
+          notebook_task:
+            notebook_path: /Workspace/flights/medallion_managing/gold/gold_flights_init
+            source: WORKSPACE
+        - task_key: Create_Silver
+          depends_on:
+            - task_key: Clear_Silver
+          notebook_task:
+            notebook_path: /Workspace/flights/medallion_managing/silver/silver_flights_init
+            source: WORKSPACE
+        - task_key: Load_Data_Bronze
+          depends_on:
+            - task_key: Create_Bronze
+          notebook_task:
+            notebook_path: /Workspace/flights/medallion_managing/bronze/bronze_flights_load_data
+            source: WORKSPACE
+        - task_key: Test_Not_Empty_Bronze
+          depends_on:
+            - task_key: Load_Data_Bronze
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/not_empty_tests/test_bronze
+            source: WORKSPACE
+        - task_key: Test_Schema_Bronze
+          depends_on:
+            - task_key: Create_Bronze
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/schema_tests/test_bronze
+            source: WORKSPACE
+        - task_key: Load_Data_Silver
+          depends_on:
+            - task_key: Test_Schema_Bronze
+            - task_key: Test_Not_Empty_Bronze
+            - task_key: Create_Silver
+          notebook_task:
+            notebook_path: /Workspace/flights/medallion_managing/silver/silver_flights_load_data
+            source: WORKSPACE
+        - task_key: Test_Not_Empty_Silver
+          depends_on:
+            - task_key: Load_Data_Silver
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/not_empty_tests/test_silver
+            source: WORKSPACE
+        - task_key: Test_Schema_Gold
+          depends_on:
+            - task_key: Create_Gold
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/schema_tests/test_gold
+            source: WORKSPACE
+        - task_key: Test_Schema_Silver
+          depends_on:
+            - task_key: Create_Silver
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/schema_tests/test_silver
+            source: WORKSPACE
+        - task_key: Load_Data_Gold
+          depends_on:
+            - task_key: Test_Schema_Silver
+            - task_key: Test_Not_Empty_Silver
+            - task_key: Test_Schema_Gold
+          notebook_task:
+            notebook_path: /Workspace/flights/medallion_managing/gold/gold_flights_load_data
+            source: WORKSPACE
+        - task_key: Test_Not_Empty_Gold
+          depends_on:
+            - task_key: Load_Data_Gold
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/not_empty_tests/test_gold
+            source: WORKSPACE
+        - task_key: Generate_Report
+          depends_on:
+            - task_key: Test_Not_Empty_Gold
+          notebook_task:
+            notebook_path: /Workspace/flights/reporting/report_generation
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
