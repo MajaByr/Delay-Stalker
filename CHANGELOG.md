@@ -1,3 +1,9 @@
+## [1.2.1] - 2025-12-10 (#7)
+
+### Changed
+
+- readme reporting section
+
 ## [1.2.0] - 2025-12-10 (#2)
 
 ### Added
