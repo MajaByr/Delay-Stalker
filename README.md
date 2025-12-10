@@ -59,6 +59,8 @@ Each layer has dedicated scripts for:
 
 Additionally, the **gold layer is integrated with script for business report generation**.
 
+![alt text](reporting/business_report.png "Business Report")
+
 ### Slowly Changing Dimensions (SCD)
 
 The system supports Slowly Changing Dimensions (SCD), preserving historical changes while maintaining current data for analytics. Each layer builds upon the previous one, maintaining a **clean, traceable, and auditable** pipeline from raw to business-ready datasets.
