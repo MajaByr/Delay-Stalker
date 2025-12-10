@@ -43,13 +43,13 @@ resources:
           depends_on:
             - task_key: Load_Data_Bronze
           notebook_task:
-            notebook_path: /Workspace/flights/tests/not_empty_tests/test_bronze
+            notebook_path: /Workspace/flights/tests/not_empty_tests/bronze_not_empty_test
             source: WORKSPACE
         - task_key: Test_Schema_Bronze
           depends_on:
             - task_key: Create_Bronze
           notebook_task:
-            notebook_path: /Workspace/flights/tests/schema_tests/test_bronze
+            notebook_path: /Workspace/flights/tests/schema_tests/bronze_schema_test
             source: WORKSPACE
         - task_key: Load_Data_Silver
           depends_on:
@@ -63,25 +63,25 @@ resources:
           depends_on:
             - task_key: Load_Data_Silver
           notebook_task:
-            notebook_path: /Workspace/flights/tests/not_empty_tests/test_silver
+            notebook_path: /Workspace/flights/tests/not_empty_tests/silver_not_empty_test
             source: WORKSPACE
         - task_key: Test_Schema_Gold
           depends_on:
             - task_key: Create_Gold
           notebook_task:
-            notebook_path: /Workspace/flights/tests/schema_tests/test_gold
+            notebook_path: /Workspace/flights/tests/schema_tests/gold_schema_test
             source: WORKSPACE
         - task_key: Test_Schema_Silver
           depends_on:
             - task_key: Create_Silver
           notebook_task:
-            notebook_path: /Workspace/flights/tests/schema_tests/test_silver
+            notebook_path: /Workspace/flights/tests/schema_tests/silver_schema_test
             source: WORKSPACE
         - task_key: Load_Data_Gold
           depends_on:
             - task_key: Test_Schema_Silver
             - task_key: Test_Not_Empty_Silver
-            - task_key: Test_Schema_Gold
+            - task_key: Create_Gold
           notebook_task:
             notebook_path: /Workspace/flights/medallion_managing/gold/gold_flights_load_data
             source: WORKSPACE
@@ -89,10 +89,11 @@ resources:
           depends_on:
             - task_key: Load_Data_Gold
           notebook_task:
-            notebook_path: /Workspace/flights/tests/not_empty_tests/test_gold
+            notebook_path: /Workspace/flights/tests/not_empty_tests/gold_not_empty_test
             source: WORKSPACE
         - task_key: Generate_Report
           depends_on:
+            - task_key: Test_Schema_Gold
             - task_key: Test_Not_Empty_Gold
           notebook_task:
             notebook_path: /Workspace/flights/reporting/report_generation

@@ -1,8 +1,45 @@
 # Databricks notebook source
+
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StringType, StructField, StructType
+from pyspark.sql.types import (
+    StringType,
+    StructField,
+    StructType,
+)
 
 spark = SparkSession.builder.getOrCreate()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC
+# MAGIC # Table Schema Test
+
+# COMMAND ----------
+
+
+def test_schema(df, expected_schema):
+    df_schema = df.schema
+
+    # Check column names
+    expected_cols = [f.name for f in expected_schema.fields]
+    df_cols = [f.name for f in df_schema.fields]
+    if expected_cols != df_cols:
+        raise ValueError(
+            f"Names of columns differ. Expected '{expected_cols}', recieved: '{df_cols}'",
+        )
+    else:
+        print("Names of the columns are correct")
+
+    # Check column types
+    for f_exp, f_actual in zip(expected_schema.fields, df_schema.fields):
+        if f_exp.dataType != f_actual.dataType:
+            raise ValueError(
+                f"Data type {f_exp.name} is not as expected. Expected: '{f_exp.dataType}', recieved: '{f_actual.dataType}'",
+            )
+
+    print(f"Column have correct types")
+
 
 # COMMAND ----------
 
@@ -13,9 +50,9 @@ airlines_schema = StructType(
     ],
 )
 
-df_airlines = spark.createDataFrame([], schema=airlines_schema)
+df_airlines = spark.table("flights_bronze.airlines")
 
-df_airlines.write.mode("overwrite").saveAsTable("flights_bronze.airlines")
+test_schema(df_airlines, airlines_schema)
 
 # COMMAND ----------
 
@@ -31,9 +68,9 @@ airports_schema = StructType(
     ],
 )
 
-df_airports = spark.createDataFrame([], schema=airports_schema)
+df_airports = spark.table("flights_bronze.airports")
 
-df_airports.write.mode("overwrite").saveAsTable("flights_bronze.airports")
+test_schema(df_airports, airports_schema)
 
 # COMMAND ----------
 
@@ -73,8 +110,7 @@ flights_schema = StructType(
     ],
 )
 
-df_flights = spark.createDataFrame([], schema=flights_schema)
+df_flights = spark.table("flights_bronze.flights")
 
-df_flights.write.mode("overwrite").saveAsTable("flights_bronze.flights")
 
-# COMMAND ----------
+test_schema(df_flights, flights_schema)

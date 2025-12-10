@@ -1,11 +1,16 @@
 # Databricks notebook source
+
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
 # MAGIC %md
 # MAGIC
 # MAGIC # Test if Tables are not Empty
 
 # COMMAND ----------
 
-database = "flights_bronze"
+database = "flights_gold"
 tables = spark.catalog.listTables(database)
 
 for tbl in tables:
