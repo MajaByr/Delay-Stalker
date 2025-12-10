@@ -14,6 +14,38 @@ spark = SparkSession.builder.getOrCreate()
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC
+# MAGIC # Table Schema Test
+
+# COMMAND ----------
+
+
+def test_schema(df, expected_schema):
+    df_schema = df.schema
+
+    # Check column names
+    expected_cols = [f.name for f in expected_schema.fields]
+    df_cols = [f.name for f in df_schema.fields]
+    if expected_cols != df_cols:
+        raise ValueError(
+            f"Names of columns differ. Expected '{expected_cols}', recieved: '{df_cols}'",
+        )
+    else:
+        print("Names of the columns are correct")
+
+    # Check column types
+    for f_exp, f_actual in zip(expected_schema.fields, df_schema.fields):
+        if f_exp.dataType != f_actual.dataType:
+            raise ValueError(
+                f"Data type {f_exp.name} is not as expected. Expected: '{f_exp.dataType}', recieved: '{f_actual.dataType}'",
+            )
+
+    print(f"Column have correct types")
+
+
+# COMMAND ----------
+
 flights_schema = StructType(
     [
         StructField("flight_number", IntegerType(), True),
@@ -27,13 +59,11 @@ flights_schema = StructType(
     ],
 )
 
-df_flights = spark.createDataFrame([], schema=flights_schema)
+df_flights = spark.table("flights_gold.flights")
 
-df_flights.write.mode("overwrite").saveAsTable("flights_gold.flights")
+test_schema(df_flights, flights_schema)
 
 # COMMAND ----------
-
-# Origin airport delays
 
 origins_delays_schema = StructType(
     [
@@ -48,14 +78,11 @@ origins_delays_schema = StructType(
     ],
 )
 
-df_origins_delays = spark.createDataFrame([], schema=origins_delays_schema)
+df_origins_delays = spark.table("flights_gold.origins_delays")
 
-df_origins_delays.write.mode("append").saveAsTable("flights_gold.origins_delays")
-
+test_schema(df_origins_delays, origins_delays_schema)
 
 # COMMAND ----------
-
-# Destination airport cancellations
 
 destinations_cancellations_schema = StructType(
     [
@@ -67,19 +94,11 @@ destinations_cancellations_schema = StructType(
     ],
 )
 
-df_destinations_cancellations = spark.createDataFrame(
-    [],
-    schema=destinations_cancellations_schema,
-)
+df_destinations_cancellations = spark.table("flights_gold.destinations_cancellations")
 
-df_destinations_cancellations.write.mode("append").saveAsTable(
-    "flights_gold.destinations_cancellations",
-)
-
+test_schema(df_destinations_cancellations, destinations_cancellations_schema)
 
 # COMMAND ----------
-
-# Daily distances
 
 daily_distances_schema = StructType(
     [
@@ -90,6 +109,6 @@ daily_distances_schema = StructType(
     ],
 )
 
-df_daily_distances = spark.createDataFrame([], schema=daily_distances_schema)
+df_daily_distances = spark.table("flights_gold.daily_distances")
 
-df_daily_distances.write.mode("append").saveAsTable("flights_gold.daily_distances")
+test_schema(df_daily_distances, daily_distances_schema)

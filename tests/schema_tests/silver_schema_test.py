@@ -15,7 +15,37 @@ spark = SparkSession.builder.getOrCreate()
 
 # COMMAND ----------
 
-# SCD Type 2 - airlines can change their name for marketing purposes
+# MAGIC %md
+# MAGIC
+# MAGIC # Table Schema Test
+
+# COMMAND ----------
+
+
+def test_schema(df, expected_schema):
+    df_schema = df.schema
+
+    # Check column names
+    expected_cols = [f.name for f in expected_schema.fields]
+    df_cols = [f.name for f in df_schema.fields]
+    if expected_cols != df_cols:
+        raise ValueError(
+            f"Names of columns differ. Expected '{expected_cols}', recieved: '{df_cols}'",
+        )
+    else:
+        print("Names of the columns are correct")
+
+    # Check column types
+    for f_exp, f_actual in zip(expected_schema.fields, df_schema.fields):
+        if f_exp.dataType != f_actual.dataType:
+            raise ValueError(
+                f"Data type {f_exp.name} is not as expected. Expected: '{f_exp.dataType}', recieved: '{f_actual.dataType}'",
+            )
+
+    print(f"Column have correct types")
+
+
+# COMMAND ----------
 
 airlines_schema = StructType(
     [
@@ -27,13 +57,11 @@ airlines_schema = StructType(
     ],
 )
 
-df_airlines = spark.createDataFrame([], schema=airlines_schema)
+df_airlines = spark.table("flights_silver.airlines")
 
-df_airlines.write.mode("append").saveAsTable("flights_silver.airlines")
+test_schema(df_airlines, airlines_schema)
 
 # COMMAND ----------
-
-# SCD Type 1 - cities won't change their location (and we can assume that names too)
 
 cities_schema = StructType(
     [
@@ -46,13 +74,11 @@ cities_schema = StructType(
     ],
 )
 
-df_cities = spark.createDataFrame([], schema=cities_schema)
+df_cities = spark.table("flights_silver.cities")
 
-df_cities.write.mode("overwrite").saveAsTable("flights_silver.cities")
+test_schema(df_cities, cities_schema)
 
 # COMMAND ----------
-
-# SCD Type 1
 
 airports_schema = StructType(
     [
@@ -62,13 +88,11 @@ airports_schema = StructType(
     ],
 )
 
-df_airports = spark.createDataFrame([], schema=airports_schema)
+df_airports = spark.table("flights_silver.airports")
 
-df_airports.write.mode("overwrite").saveAsTable("flights_silver.airports")
+test_schema(df_airports, airports_schema)
 
 # COMMAND ----------
-
-# SCD Type 1 - routes won't change
 
 routes_schema = StructType(
     [
@@ -79,9 +103,9 @@ routes_schema = StructType(
     ],
 )
 
-df_routes = spark.createDataFrame([], schema=routes_schema)
+df_routes = spark.table("flights_silver.routes")
 
-df_routes.write.mode("overwrite").saveAsTable("flights_silver.routes")
+test_schema(df_routes, routes_schema)
 
 # COMMAND ----------
 
@@ -95,13 +119,11 @@ dates_schema = StructType(
     ],
 )
 
-df_dates = spark.createDataFrame([], schema=dates_schema)
+df_dates = spark.table("flights_silver.dates")
 
-df_dates.write.mode("overwrite").saveAsTable("flights_silver.dates")
+test_schema(df_dates, dates_schema)
 
 # COMMAND ----------
-
-# SCD Type 2 - keep all history - time of changes and historical values
 
 cancellations_schema = StructType(
     [
@@ -115,13 +137,11 @@ cancellations_schema = StructType(
     ],
 )
 
-df_cancellations = spark.createDataFrame([], schema=cancellations_schema)
+df_cancellations = spark.table("flights_silver.cancellations")
 
-df_cancellations.write.mode("overwrite").saveAsTable("flights_silver.cancellations")
+test_schema(df_cancellations, cancellations_schema)
 
 # COMMAND ----------
-
-# SCD Type 1
 
 wheels_schema = StructType(
     [
@@ -131,13 +151,11 @@ wheels_schema = StructType(
     ],
 )
 
-df_wheels = spark.createDataFrame([], schema=wheels_schema)
+df_wheels = spark.table("flights_silver.wheels")
 
-df_wheels.write.mode("overwrite").saveAsTable("flights_silver.wheels")
+test_schema(df_wheels, wheels_schema)
 
 # COMMAND ----------
-
-# SCD Type 1
 
 taxis_schema = StructType(
     [
@@ -147,13 +165,11 @@ taxis_schema = StructType(
     ],
 )
 
-df_taxis = spark.createDataFrame([], schema=taxis_schema)
+df_taxis = spark.table("flights_silver.taxis")
 
-df_taxis.write.mode("overwrite").saveAsTable("flights_silver.taxis")
+test_schema(df_taxis, taxis_schema)
 
 # COMMAND ----------
-
-# SCD Type 3 - keep previous delay time
 
 arrivals_schema = StructType(
     [
@@ -165,13 +181,11 @@ arrivals_schema = StructType(
     ],
 )
 
-df_arrivals = spark.createDataFrame([], schema=arrivals_schema)
+df_arrivals = spark.table("flights_silver.arrivals")
 
-df_arrivals.write.mode("overwrite").saveAsTable("flights_silver.arrivals")
+test_schema(df_arrivals, arrivals_schema)
 
 # COMMAND ----------
-
-# SCD Type 3 - keep previous delay time
 
 departures_schema = StructType(
     [
@@ -183,13 +197,11 @@ departures_schema = StructType(
     ],
 )
 
-df_departures = spark.createDataFrame([], schema=departures_schema)
+df_departures = spark.table("flights_silver.departures")
 
-df_departures.write.mode("overwrite").saveAsTable("flights_silver.departures")
+test_schema(df_departures, departures_schema)
 
 # COMMAND ----------
-
-# SCD Type 1 - do not track all delay causes
 
 delays_schema = StructType(
     [
@@ -202,13 +214,11 @@ delays_schema = StructType(
     ],
 )
 
-df_delays = spark.createDataFrame([], schema=delays_schema)
+df_delays = spark.table("flights_silver.delays")
 
-df_delays.write.mode("overwrite").saveAsTable("flights_silver.delays")
+test_schema(df_delays, delays_schema)
 
 # COMMAND ----------
-
-# SCD Type 1
 
 overall_schedules_schema = StructType(
     [
@@ -219,15 +229,11 @@ overall_schedules_schema = StructType(
     ],
 )
 
-df_overall_schedules = spark.createDataFrame([], schema=overall_schedules_schema)
+df_overall_schedules = spark.table("flights_silver.overall_schedules")
 
-df_overall_schedules.write.mode("overwrite").saveAsTable(
-    "flights_silver.overall_schedules",
-)
+test_schema(df_overall_schedules, overall_schedules_schema)
 
 # COMMAND ----------
-
-# SCD Type 1
 
 times_schema = StructType(
     [
@@ -241,8 +247,6 @@ times_schema = StructType(
     ],
 )
 
-df_times = spark.createDataFrame([], schema=times_schema)
+df_times = spark.table("flights_silver.times")
 
-df_times.write.mode("overwrite").saveAsTable("flights_silver.times")
-
-# COMMAND ----------
+test_schema(df_times, times_schema)

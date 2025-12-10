@@ -1,4 +1,9 @@
 # Databricks notebook source
+
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
 # MAGIC %md
 # MAGIC
 # MAGIC # Test if Tables are not Empty
