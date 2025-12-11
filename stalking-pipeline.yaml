@@ -39,6 +39,12 @@ resources:
           notebook_task:
             notebook_path: /Workspace/flights/medallion_managing/bronze/bronze_flights_load_data
             source: WORKSPACE
+        - task_key: Test_Incremental_Loading_Bronze
+          depends_on:
+            - task_key: Load_Data_Bronze
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/incremental_loading_tests/bronze_incremental_loading_test
+            source: WORKSPACE
         - task_key: Test_Not_Empty_Bronze
           depends_on:
             - task_key: Load_Data_Bronze
@@ -56,8 +62,15 @@ resources:
             - task_key: Test_Schema_Bronze
             - task_key: Test_Not_Empty_Bronze
             - task_key: Create_Silver
+            - task_key: Test_Incremental_Loading_Bronze
           notebook_task:
             notebook_path: /Workspace/flights/medallion_managing/silver/silver_flights_load_data
+            source: WORKSPACE
+        - task_key: Test_Incremental_Loading_Silver
+          depends_on:
+            - task_key: Load_Data_Silver
+          notebook_task:
+            notebook_path: /Workspace/flights/tests/incremental_loading_tests/silver_incremental_loading_test
             source: WORKSPACE
         - task_key: Test_Not_Empty_Silver
           depends_on:
@@ -82,6 +95,7 @@ resources:
             - task_key: Test_Schema_Silver
             - task_key: Test_Not_Empty_Silver
             - task_key: Create_Gold
+            - task_key: Test_Incremental_Loading_Silver
           notebook_task:
             notebook_path: /Workspace/flights/medallion_managing/gold/gold_flights_load_data
             source: WORKSPACE
