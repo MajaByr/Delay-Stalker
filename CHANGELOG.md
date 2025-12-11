@@ -1,3 +1,9 @@
+## [1.2.2] - 2025-12-11 (#9)
+
+### Changed
+
+- tests by adding incremental loading section
+
 ## [1.2.1] - 2025-12-10 (#7)
 
 ### Changed
